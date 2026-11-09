@@ -22,6 +22,6 @@ jobs:
       - name: BlueBuild Image Builder
         uses: blue-build/github-action@v1
         with:
-          recipe: config/recipe.yml
+          recipe: ./config/recipe.yml
           registry_token: ${{ secrets.GITHUB_TOKEN }}
           build_opts: "--no-sign"
