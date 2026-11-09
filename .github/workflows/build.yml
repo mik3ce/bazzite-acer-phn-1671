@@ -24,3 +24,4 @@ jobs:
         with:
           recipe: config/recipe.yml
           registry_token: ${{ secrets.GITHUB_TOKEN }}
+          build_opts: "--no-sign"
