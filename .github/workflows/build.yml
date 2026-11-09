@@ -1,0 +1,27 @@
+name: Build Custom Bazzite Image
+on:
+  # schedule:
+  #   - cron: '0 0 * * 0' # Build automatica ogni domenica
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permette di avviare la build manualmente da GitHub
+
+jobs:
+  bluebuild:
+    name: Build Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: BlueBuild Image Builder
+        uses: blue-build/github-action@v1
+        with:
+          recipe: config/recipe.yml
+          registry_token: ${{ secrets.GITHUB_TOKEN }}
+          prune: true
