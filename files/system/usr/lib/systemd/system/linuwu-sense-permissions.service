@@ -1,0 +1,12 @@
+[Unit]
+Description=Grant linuwu_sense group access to the driver's sysfs controls
+After=systemd-modules-load.service
+ConditionPathExists=/sys/module/linuwu_sense
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/linuwu-sense-set-permissions
+
+[Install]
+WantedBy=multi-user.target

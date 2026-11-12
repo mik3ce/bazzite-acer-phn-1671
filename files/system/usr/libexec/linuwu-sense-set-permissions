@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Give members of the linuwu_sense group write access to the driver's sysfs
+# controls. Runs once at boot, after systemd-modules-load loaded the module.
+set -u
+
+base="/sys/module/linuwu_sense/drivers/platform:acer-wmi/acer-wmi"
+if [[ ! -d "${base}" ]]; then
+    exit 0
+fi
+
+shopt -s nullglob
+for file in \
+    "${base}"/{predator_sense,nitro_sense}/{backlight_timeout,battery_calibration,battery_limiter,boot_animation_sound,fan_speed,lcd_override,usb_charging} \
+    "${base}"/four_zoned_kb/{four_zone_mode,per_zone_mode}; do
+    [[ -e "${file}" ]] || continue
+    chgrp linuwu_sense "${file}" 2>/dev/null || true
+    chmod 0660 "${file}" 2>/dev/null || true
+done

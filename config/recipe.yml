@@ -1,20 +1,17 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: bazzite-predator
-description: Immagine Bazzite personalizzata con modulo linuwu_sense per Acer Predator PHN16-71
-base-image: ghcr.io/ublue-os/bazzite-nvidia
+name: bazzite-acer-phn-1671
+description: Bazzite (GNOME, NVIDIA open) with the linuwu_sense driver for the Acer Predator PHN16-71
+base-image: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
 image-version: stable
 
 modules:
+  # Kernel module loading config, shutdown unit and sysfs permissions.
   - type: files
     files:
-      - usr: /usr
+      - source: system
+        destination: /
 
-  - type: containerfile
-    snippets:
-      - COPY Containerfile /tmp/Containerfile
-      - RUN bash -c "chmod +x /tmp/Containerfile && /tmp/Containerfile"
-
-  - type: default-flatpaks
-    system:
-      install:
-        - org.coolercontrol.CoolerControl
+  # Build and install linuwu_sense for the kernel in this image.
+  - type: script
+    scripts:
+      - build-linuwu-sense.sh

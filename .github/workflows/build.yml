@@ -1,27 +1,39 @@
-name: Build Custom Bazzite Image
+name: Build Custom Image
+
 on:
-  # schedule:
-  #   - cron: '0 0 * * 0' # Build automatica ogni domenica
   push:
     branches:
       - main
-  workflow_dispatch: # Permette di avviare la build manualmente da GitHub
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+  # Bazzite regularly ships a new kernel, and linuwu_sense is an out-of-tree
+  # module compiled against that kernel, so rebuild weekly.
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  bluebuild:
-    name: Build Image
+  build:
+    name: Build image
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-      id-token: write
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: BlueBuild Image Builder
+      # The BlueBuild action checks the repository out itself.
+      - name: Build with BlueBuild
         uses: blue-build/github-action@v1
         with:
-          recipe: ./config/recipe.yml
-          registry_token: ${{ secrets.GITHUB_TOKEN }}
+          # Relative to config/ (or recipes/), not the repository root.
+          recipe: recipe.yml
+          registry_token: ${{ github.token }}
+          pr_event_number: ${{ github.event.number }}
+          # Unsigned image; see README for how to enable signing.
           build_opts: "--no-sign"
